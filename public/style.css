@@ -228,15 +228,13 @@ button[type="submit"]:disabled {
     text-transform: uppercase;
 }
 
-.site-footer {
-    position: absolute;
-    bottom: 20px;
+.bottom-footer {
     width: 100%;
     text-align: center;
-    z-index: 10;
+    padding: 2rem 0;
 }
 
-.site-footer p {
+.bottom-footer p {
     color: rgba(255, 255, 255, 0.5);
     font-size: 0.8rem;
     letter-spacing: 0.5px;
@@ -245,12 +243,14 @@ button[type="submit"]:disabled {
 
 /* Navigation System */
 .site-nav {
-    position: absolute;
-    top: 20px;
+    position: sticky;
+    top: 0;
     width: 100%;
-    z-index: 10;
+    z-index: 100;
     display: flex;
     justify-content: center;
+    padding: 20px 0;
+    backdrop-filter: blur(10px);
 }
 
 .site-nav ul {
@@ -261,7 +261,6 @@ button[type="submit"]:disabled {
     padding: 12px 30px;
     border-radius: 30px;
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
 }
 
 .site-nav a {
@@ -277,6 +276,10 @@ button[type="submit"]:disabled {
 }
 
 /* New Pages specific CSS */
+.content-section {
+    margin-bottom: 3rem;
+    scroll-margin-top: 100px;
+}
 .highlight-box {
     background: rgba(108, 99, 255, 0.15);
     border-left: 4px solid var(--primary);

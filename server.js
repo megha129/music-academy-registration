@@ -16,10 +16,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Database Connection
 let pool;
 try {
-    // Render provides a DATABASE_URL for Postgres connections
     pool = new Pool({
         connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false } // Required for Render Postgres
+        ssl: { rejectUnauthorized: false }, // Required for Render Postgres
+        connectionTimeoutMillis: 5000 // 5 seconds timeout so it doesn't hang!
     });
     console.log('PostgreSQL pool created.');
 } catch (error) {
