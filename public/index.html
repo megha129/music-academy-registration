@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symphony Music Academy | Registration</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-animation"></div>
+    <div class="container">
+        <header>
+            <h1>Symphony Academy</h1>
+            <p>Unleash Your Musical Potential</p>
+        </header>
+
+        <div class="form-container">
+            <h2>Join Our Programs</h2>
+            <form id="registrationForm">
+                <div class="input-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required placeholder="John Doe">
+                </div>
+                
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required placeholder="john@example.com">
+                </div>
+                
+                <div class="input-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="+1 234 567 8900">
+                </div>
+                
+                <div class="input-group">
+                    <label for="instrument">Instrument of Choice</label>
+                    <select id="instrument" name="instrument" required>
+                        <option value="" disabled selected>Select an instrument</option>
+                        <option value="Piano">Piano</option>
+                        <option value="Guitar">Guitar</option>
+                        <option value="Violin">Violin</option>
+                        <option value="Drums">Drums</option>
+                        <option value="Vocals">Vocals</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="submitBtn">
+                    <span class="btn-text">Register Now</span>
+                    <div class="spinner hidden"></div>
+                </button>
+            </form>
+            <div id="messageBox" class="message-box hidden"></div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
