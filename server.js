@@ -109,7 +109,7 @@ app.post('/api/register', async (req, res) => {
 });
 
 // Fallback to index.html for any other route
-app.get('*', (req, res) => {
+app.use((req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
