@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const path = require('path');
@@ -16,19 +16,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Database Connection
 let pool;
 try {
-    pool = mysql.createPool({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-        port: process.env.DB_PORT || 3306,
-        waitForConnections: true,
-        connectionLimit: 10,
-        queueLimit: 0
+    // Render provides a DATABASE_URL for Postgres connections
+    pool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false } // Required for Render Postgres
     });
-    console.log('MySQL pool created.');
+    console.log('PostgreSQL pool created.');
 } catch (error) {
-    console.error('Failed to create MySQL pool:', error);
+    console.error('Failed to create PostgreSQL pool:', error);
 }
 
 // Nodemailer Transporter
@@ -44,10 +39,10 @@ const transporter = nodemailer.createTransport({
 async function initDB() {
     if (!pool) return;
     try {
-        const connection = await pool.getConnection();
-        await connection.query(`
+        const client = await pool.connect();
+        await client.query(`
             CREATE TABLE IF NOT EXISTS registrations (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
                 email VARCHAR(255) NOT NULL,
                 phone VARCHAR(50) NOT NULL,
@@ -55,7 +50,7 @@ async function initDB() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
-        connection.release();
+        client.release();
         console.log('Database table verified/created.');
     } catch (err) {
         console.error('Error verifying database:', err);
@@ -73,8 +68,8 @@ app.post('/api/register', async (req, res) => {
     try {
         // 1. Save to Database
         if (pool) {
-            await pool.execute(
-                'INSERT INTO registrations (name, email, phone, instrument) VALUES (?, ?, ?, ?)',
+            await pool.query(
+                'INSERT INTO registrations (name, email, phone, instrument) VALUES ($1, $2, $3, $4)',
                 [name, email, phone, instrument]
             );
         } else {
