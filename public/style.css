@@ -243,14 +243,12 @@ button[type="submit"]:disabled {
 
 /* Navigation System */
 .site-nav {
-    position: sticky;
-    top: 0;
     width: 100%;
     z-index: 100;
     display: flex;
     justify-content: center;
     padding: 20px 0;
-    backdrop-filter: blur(10px);
+    position: relative; /* Changed from absolute/sticky to relative */
 }
 
 .site-nav ul {
