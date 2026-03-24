@@ -58,11 +58,22 @@ async function initDB() {
 }
 
 // Routes
+app.get('/api/debug', (req, res) => {
+    res.status(200).json({
+        db_configured: !!process.env.DATABASE_URL,
+        email_user: process.env.EMAIL_USER ? 'Set' : 'Not Set',
+        email_pass: process.env.EMAIL_PASS ? 'Set' : 'Not Set',
+        port: PORT
+    });
+});
+
 app.get('/api/register', (req, res) => {
     res.status(200).json({ message: 'Register API is active and ready for POST requests.' });
 });
 
 app.post('/api/register', async (req, res) => {
+    console.log('--- NEW REGISTRATION REQUEST RECEIVED ---');
+    console.log('Payload:', req.body);
     const { name, email, phone, instrument } = req.body;
 
     if (!name || !email || !phone || !instrument) {

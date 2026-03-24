@@ -34,9 +34,7 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
     btnText.textContent = 'Processing...';
     spinner.classList.remove('hidden');
     
-    // Add a 30-second timeout to the fetch (Render free tier can be slow on first load)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    console.log('Sending registration request to /api/register...');
     
     try {
         const response = await fetch('/api/register', {
@@ -44,11 +42,10 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(formData),
-            signal: controller.signal
+            body: JSON.stringify(formData)
         });
         
-        clearTimeout(timeoutId);
+        console.log('Response received from server:', response.status);
         
         const data = await response.json();
         
