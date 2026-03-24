@@ -1,9 +1,7 @@
-console.log(`[${new Date().toISOString()}] --- SERVER STARTING v3.3 (SMTP FINAL ATTEMPT) ---`);
 require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
 const path = require('path');
 
 const app = express();
@@ -28,25 +26,6 @@ try {
     console.error(`PostgreSQL Error:`, error);
 }
 
-// Nodemailer Transporter
-const gmailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : '';
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    pool: true, // USE POOLING
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: gmailPass
-    },
-    tls: {
-        servername: 'smtp.gmail.com', // EXPLICIT SNI
-        rejectUnauthorized: false
-    },
-    logger: true,
-    debug: true
-});
-
 // Create table if not exists
 async function initDB() {
     if (!pool) return;
@@ -70,7 +49,7 @@ async function initDB() {
 
 // --- API ROUTES ---
 
-// Registration Route
+// Registration Route (Database Only)
 app.post('/api/register', async (req, res) => {
     const { name, email, phone, instrument } = req.body;
 
@@ -79,33 +58,13 @@ app.post('/api/register', async (req, res) => {
     }
 
     try {
-        // 1. Save to Database (7s timeout)
         if (pool) {
-            const dbPromise = pool.query(
+            await pool.query(
                 'INSERT INTO registrations (name, email, phone, instrument) VALUES ($1, $2, $3, $4)',
                 [name, email, phone, instrument]
             );
-            await Promise.race([
-                dbPromise,
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Database Timeout')), 7000))
-            ]).catch(err => console.error(`DB Error:`, err.message));
         }
-
-        // 2. Send Email (7s timeout - may fail on Render due to network port blocks)
-        if (process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.DESTINATION_EMAIL) {
-            const mailOptions = {
-                from: process.env.EMAIL_USER,
-                to: process.env.DESTINATION_EMAIL,
-                subject: `New Registration: ${name}`,
-                html: `<p><strong>Name:</strong> ${name}</p><p><strong>Instrument:</strong> ${instrument}</p>`
-            };
-            await Promise.race([
-                transporter.sendMail(mailOptions),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Email Timeout')), 7000))
-            ]).catch(err => console.error(`Email Error:`, err.message));
-        }
-
-        res.status(200).json({ message: 'Registration successful!' });
+        res.status(200).json({ message: 'Registration saved to database!' });
     } catch (error) {
         console.error(`Final Route Error:`, error);
         res.status(500).json({ message: 'Internal server error.' });
@@ -127,7 +86,7 @@ app.get('/api/admin/registrations', async (req, res) => {
 });
 
 // Fallback to index.html
-app.use((req, res) => {
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
