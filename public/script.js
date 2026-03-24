@@ -36,31 +36,20 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
     
     console.log('Sending registration request to /api/register...');
     
-    // --- EMAILJS CONFIG ---
-    const EMAILJS_PUBLIC_KEY = "4hh-HDCpw_jMw5Dar"; 
-    const EMAILJS_SERVICE_ID = "service_2x98zwz";
-    const EMAILJS_TEMPLATE_ID = "template_olpvqws";
+        // --- 1. Send Email via EmailJS (Frontend) ---
+        console.log("Attempting to send email via EmailJS...");
+        emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, '#registrationForm', EMAILJS_PUBLIC_KEY)
+            .then((result) => {
+                console.log('EmailJS SUCCESS!', result.status, result.text);
+            }, (error) => {
+                console.error('EmailJS FAILED...', error);
+                alert("Email delivery failed: " + JSON.stringify(error));
+            });
 
-    try {
-        // 1. Send Email via EmailJS (Frontend)
-        if (EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
-            emailjs.init(EMAILJS_PUBLIC_KEY);
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                from_name: formData.name,
-                from_email: formData.email,
-                phone: formData.phone,
-                instrument: formData.instrument,
-                to_email: "meghashreenandish14@gmail.com"
-            }).then(() => console.log('EmailJS: Success!'))
-              .catch(err => console.error('EmailJS Error:', err));
-        }
-
-        // 2. Save to Database (Backend)
+        // --- 2. Save to Database (Backend) ---
         const response = await fetch('/api/register', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         });
         
