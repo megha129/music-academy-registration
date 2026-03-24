@@ -289,8 +289,35 @@ button[type="submit"]:hover {
 .message-box.success { background: rgba(16, 185, 129, 0.1); color: #10B981; }
 .message-box.error { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
 
+.bg-decor-left {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    font-size: 2.5rem;
+    z-index: 0;
+    opacity: 0.6;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    filter: drop-shadow(0 0 10px rgba(129, 140, 248, 0.4));
+    animation: float-decor 6s ease-in-out infinite alternate;
+}
+
+.bg-decor-left span {
+    display: block;
+    animation: rotate-decor 4s ease-in-out infinite alternate;
+}
+
+@keyframes float-decor {
+    0% { transform: translateY(0) rotate(-5deg); }
+    100% { transform: translateY(-20px) rotate(5deg); }
+}
+
+@keyframes rotate-decor {
+    0% { transform: rotate(-10deg) scale(0.9); }
+    100% { transform: rotate(10deg) scale(1.1); }
+}
+
 @media (max-width: 700px) {
-    .programs-grid { grid-template-columns: 1fr; }
-    header h1 { font-size: 2.2rem; }
-    .site-nav ul { gap: 15px; padding: 10px 20px; }
+    .bg-decor-left { font-size: 1.8rem; bottom: 20px; left: 20px; }
 }
