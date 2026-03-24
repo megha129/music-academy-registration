@@ -57,6 +57,7 @@ async function initDB() {
     }
 }
 
+console.log('Initializing API Routes...');
 // Routes
 app.get('/api/debug', (req, res) => {
     res.status(200).json({
