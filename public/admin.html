@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Rythm Academy</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container { max-width: 1000px; margin: 50px auto; padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 15px; backdrop-filter: blur(10px); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; color: white; }
+        th, td { padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: left; }
+        th { background: rgba(99, 102, 241, 0.2); }
+        tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+    </style>
+</head>
+<body class="dark-theme">
+    <div class="admin-container">
+        <h1>Registrations Dashboard</h1>
+        <p>Password: <input type="password" id="adminPass" value="admin123"> <button onclick="loadData()">Refresh</button></p>
+        <div id="status"></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Instrument</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="regTableBody">
+                <!-- Data will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadData() {
+            const pass = document.getElementById('adminPass').value;
+            const status = document.getElementById('status');
+            const tbody = document.getElementById('regTableBody');
+            
+            status.textContent = 'Loading...';
+            tbody.innerHTML = '';
+
+            try {
+                const response = await fetch(`/api/admin/registrations?password=${pass}`);
+                if (!response.ok) throw new Error('Unauthorized or Server Error');
+                
+                const data = await response.json();
+                status.textContent = `Total: ${data.length} registrations`;
+                
+                data.forEach(reg => {
+                    const row = `<tr>
+                        <td>${reg.name}</td>
+                        <td>${reg.email}</td>
+                        <td>${reg.phone}</td>
+                        <td>${reg.instrument}</td>
+                        <td>${new Date(reg.created_at).toLocaleString()}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            } catch (err) {
+                status.textContent = 'Error: ' + err.message;
+            }
+        }
+        window.onload = loadData;
+    </script>
+</body>
+</html>

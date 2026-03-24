@@ -132,6 +132,22 @@ app.get('/api/register', (req, res) => {
     res.status(200).json({ message: 'Register API is active and ready for POST requests.' });
 });
 
+app.get('/api/admin/registrations', async (req, res) => {
+    const { password } = req.query;
+    if (password !== 'admin123') {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    try {
+        if (!pool) return res.status(500).json({ message: 'DB not connected' });
+        const result = await pool.query('SELECT * FROM registrations ORDER BY created_at DESC');
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error('Admin Error:', err);
+        res.status(500).json({ message: 'Error fetching registrations' });
+    }
+});
+
 app.post('/api/register', async (req, res) => {
     console.log(`[${new Date().toISOString()}] --- NEW REGISTRATION REQUEST RECEIVED ---`);
     console.log('Payload:', req.body);
