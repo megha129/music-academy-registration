@@ -70,18 +70,27 @@ app.post('/api/register', async (req, res) => {
     }
 
     try {
+        console.time('Registration Process');
         // 1. Save to Database
         if (pool) {
+            console.log('Inserting into database...');
             await pool.query(
                 'INSERT INTO registrations (name, email, phone, instrument) VALUES ($1, $2, $3, $4)',
                 [name, email, phone, instrument]
             );
+            console.log('Database insert complete.');
         } else {
             console.warn('Database not connected. Skipping DB insert.');
         }
+    } catch (dbError) {
+        console.error('Database Error:', dbError);
+        // We continue to email even if DB fails for now, or you can choose to fail here
+    }
 
+    try {
         // 2. Send Email
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.DESTINATION_EMAIL) {
+            console.log('Sending email...');
             const mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: process.env.DESTINATION_EMAIL,
@@ -96,13 +105,15 @@ app.post('/api/register', async (req, res) => {
             };
             
             await transporter.sendMail(mailOptions);
+            console.log('Email sent complete.');
         } else {
             console.warn('Email credentials not fully configured. Skipping email.');
         }
-
+        console.timeEnd('Registration Process');
         res.status(200).json({ message: 'Registration successful!' });
     } catch (error) {
-        console.error('Registration Error:', error);
+        console.timeEnd('Registration Process');
+        console.error('Final Registration Error:', error);
         res.status(500).json({ message: 'Internal server error during registration.' });
     }
 });
