@@ -28,10 +28,22 @@ try {
 
 // Nodemailer Transporter
 const transporter = nodemailer.createTransport({
-    service: 'gmail', // or another service depending on config
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // use SSL
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    }
+});
+
+// Verify SMTP connection at startup
+transporter.verify((error, success) => {
+    if (error) {
+        console.error('--- NODEMAILER SMTP ERROR ---');
+        console.error(error);
+    } else {
+        console.log('--- NODEMAILER READY TO SEND EMAILS ---');
     }
 });
 
