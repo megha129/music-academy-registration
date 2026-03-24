@@ -81,7 +81,9 @@ async function initDB() {
 }
 
 console.log(`[${new Date().toISOString()}] Initializing API Routes...`);
-// Routes
+
+// --- API ROUTES (Define these BEFORE the fallback) ---
+
 app.get('/api/debug', (req, res) => {
     res.status(200).json({
         db_configured: !!process.env.DATABASE_URL,
@@ -89,6 +91,30 @@ app.get('/api/debug', (req, res) => {
         email_pass: process.env.EMAIL_PASS ? 'Set' : 'Not Set',
         port: PORT
     });
+});
+
+app.get('/api/test-email', async (req, res) => {
+    console.log(`[${new Date().toISOString()}] --- MANUAL EMAIL TEST TRIGGERED ---`);
+    try {
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || !process.env.DESTINATION_EMAIL) {
+            return res.status(400).json({ message: 'Error: Missing EMAIL_USER, EMAIL_PASS, or DESTINATION_EMAIL in Render settings.' });
+        }
+        
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: process.env.DESTINATION_EMAIL,
+            subject: 'Music Academy: Manual Test Email',
+            text: 'If you receive this, your email configuration is WORKING!'
+        };
+        
+        console.log(`[${new Date().toISOString()}] Sending test email...`);
+        await transporter.sendMail(mailOptions);
+        console.log(`[${new Date().toISOString()}] Test email sent successfully`);
+        res.status(200).json({ message: 'Success! Test email sent. Please check your inbox and spam folders.' });
+    } catch (err) {
+        console.error(`[${new Date().toISOString()}] Manual Test Email Error:`, err);
+        res.status(500).json({ message: 'Error sending test email', error: err.message });
+    }
 });
 
 app.get('/api/register', (req, res) => {
@@ -107,7 +133,6 @@ app.post('/api/register', async (req, res) => {
     try {
         console.time('Registration Process');
         
-        // 1. Save to Database with a 7-second timeout
         if (pool) {
             console.log(`[${new Date().toISOString()}] Inserting into database...`);
             const dbPromise = pool.query(
@@ -122,7 +147,6 @@ app.post('/api/register', async (req, res) => {
               .catch(err => console.error(`[${new Date().toISOString()}] Database Error/Timeout:`, err.message));
         }
 
-        // 2. Send Email with a 7-second timeout
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.DESTINATION_EMAIL) {
             console.log(`[${new Date().toISOString()}] Sending email FROM: ${process.env.EMAIL_USER} TO: ${process.env.DESTINATION_EMAIL}`);
             const mailOptions = {
@@ -154,36 +178,13 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// Fallback to index.html for any other route
+// --- FALLBACK ROUTE (Keep this LAST) ---
+
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start Server
-app.get('/api/test-email', async (req, res) => {
-    console.log('--- MANUAL EMAIL TEST TRIGGERED ---');
-    try {
-        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || !process.env.DESTINATION_EMAIL) {
-            return res.status(400).json({ message: 'Missing email env variables' });
-        }
-        
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: process.env.DESTINATION_EMAIL,
-            subject: 'Music Academy: Manual Test Email',
-            text: 'If you receive this, your email configuration is WORKING!'
-        };
-        
-        console.log('Sending test email...');
-        await transporter.sendMail(mailOptions);
-        console.log('Test email sent successfully');
-        res.status(200).json({ message: 'Test email sent! Check your inbox and spam.' });
-    } catch (err) {
-        console.error('Manual Test Email Error:', err);
-        res.status(500).json({ message: 'Error sending test email', error: err.message });
-    }
-});
-
 app.listen(PORT, () => {
     console.log(`[${new Date().toISOString()}] Server is UP on port ${PORT}`);
     initDB().catch(err => console.error(`[${new Date().toISOString()}] Background DB Init Error:`, err));
