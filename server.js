@@ -40,16 +40,13 @@ try {
 }
 
 // Nodemailer Transporter
+// Sanitize App Password (remove spaces if user copied with them)
+const gmailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : '';
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // true for 465, false for 587
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        rejectUnauthorized: false
+        pass: gmailPass
     }
 });
 
@@ -113,12 +110,12 @@ app.get('/api/test-email', async (req, res) => {
             text: 'If you receive this, your email configuration is WORKING!'
         };
         
-        console.log(`[${new Date().toISOString()}] Sending test email (with 10s timeout)...`);
+        console.log(`[${new Date().toISOString()}] Sending test email (with 30s timeout)...`);
         
-        // Wait for Email but don't hang for more than 10s
+        // Wait for Email but don't hang for more than 30s
         await Promise.race([
             transporter.sendMail(mailOptions),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Email Connection Timeout')), 10000))
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Email Connection Timeout')), 30000))
         ]);
         
         console.log(`[${new Date().toISOString()}] Test email sent successfully`);
