@@ -54,6 +54,7 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
         }
     } catch (error) {
         // Network or other error
+        console.error('Fetch Error:', error);
         messageBox.textContent = 'Failed to connect to the server. Please try again later.';
         messageBox.className = 'message-box error';
     } finally {
