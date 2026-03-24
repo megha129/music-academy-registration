@@ -85,8 +85,8 @@ app.get('/api/admin/registrations', async (req, res) => {
     }
 });
 
-// Fallback to index.html
-app.get('*', (req, res) => {
+// Fallback to index.html (matches everything else)
+app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
