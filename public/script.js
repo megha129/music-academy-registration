@@ -34,8 +34,14 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
     btnText.textContent = 'Processing...';
     spinner.classList.remove('hidden');
     
-    console.log('Sending registration request to /api/register...');
-    
+    // --- EMAILJS CONFIG ---
+    const EMAILJS_PUBLIC_KEY = "4hh-HDCpw_jMw5Dar"; 
+    const EMAILJS_SERVICE_ID = "service_2x98zwz";
+    const EMAILJS_TEMPLATE_ID = "template_olpvqws";
+
+    try {
+        console.log('Sending registration request...');
+
         // --- 1. Send Email via EmailJS (Frontend) ---
         console.log("Attempting to send email via EmailJS...");
         emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, '#registrationForm', EMAILJS_PUBLIC_KEY)
@@ -54,26 +60,21 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
         });
         
         console.log('Response received from server:', response.status);
-        
         const data = await response.json();
         
         if (response.ok) {
-            // Success
-            messageBox.textContent = data.message || 'Registration successful! Check your email.';
+            messageBox.textContent = 'Registration successful! Check your email.';
             messageBox.className = 'message-box success';
             form.reset();
         } else {
-            // Error from server
             messageBox.textContent = data.message || 'An error occurred during registration.';
             messageBox.className = 'message-box error';
         }
     } catch (error) {
-        // Network or other error
         console.error('Fetch Error:', error);
-        messageBox.textContent = `Error: ${error.message}. Please check if you are on the Live Render site and not the Preview link.`;
+        messageBox.textContent = `Error: ${error.message}. Please check if you are on the Live Render site.`;
         messageBox.className = 'message-box error';
     } finally {
-        // Reset loading state
         submitBtn.disabled = false;
         btnText.textContent = 'Register Now';
         spinner.classList.add('hidden');
