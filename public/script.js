@@ -35,7 +35,6 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
     spinner.classList.remove('hidden');
     
     // --- EMAILJS CONFIG ---
-    const EMAILJS_PUBLIC_KEY = "4hh-HDCpw_jMw5Dar"; 
     const EMAILJS_SERVICE_ID = "service_2x98zwz";
     const EMAILJS_TEMPLATE_ID = "template_olpvqws";
 
@@ -43,14 +42,17 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
         console.log('Sending registration request...');
 
         // --- 1. Send Email via EmailJS (Frontend) ---
-        console.log("Attempting to send email via EmailJS...");
-        emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, '#registrationForm', EMAILJS_PUBLIC_KEY)
-            .then((result) => {
-                console.log('EmailJS SUCCESS!', result.status, result.text);
-            }, (error) => {
-                console.error('EmailJS FAILED...', error);
-                alert("Email delivery failed: " + JSON.stringify(error));
-            });
+        if (typeof emailjs !== 'undefined') {
+            console.log("Attempting to send email via EmailJS...");
+            emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, '#registrationForm')
+                .then((result) => {
+                    console.log('EmailJS SUCCESS!', result.status, result.text);
+                }, (error) => {
+                    console.error('EmailJS FAILED...', error);
+                });
+        } else {
+            console.error("EmailJS library not loaded yet.");
+        }
 
         // --- 2. Save to Database (Backend) ---
         const response = await fetch('/api/register', {
