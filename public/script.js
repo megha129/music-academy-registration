@@ -47,7 +47,6 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
             emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, '#registrationForm')
                 .then((result) => {
                     console.log('EmailJS SUCCESS!', result.status, result.text);
-                    alert("✅ Email Service: Success! (Wait for delivery)");
                 }, (error) => {
                     console.error('EmailJS FAILED...', error);
                     alert("❌ Email Service: ERROR! " + JSON.stringify(error));
