@@ -1,4 +1,4 @@
-console.log(`[${new Date().toISOString()}] --- SERVER STARTING v3.0 (Rich Dark Theme) ---`);
+console.log(`[${new Date().toISOString()}] --- SERVER STARTING v3.2 (Rich Dark Theme + SMTP Debug) ---`);
 require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
@@ -10,7 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // TOP LEVEL PING
-app.get('/ping', (req, res) => res.send('PONG V3.1 - LATEST'));
+app.get('/ping', (req, res) => res.send('PONG V3.2 - DEBUG READY'));
 
 // LOG ENV CHECK
 console.log(`[${new Date().toISOString()}] EMAIL_USER is ${process.env.EMAIL_USER ? 'PRESENT' : 'MISSING'}`);
@@ -47,7 +47,9 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: process.env.EMAIL_USER,
         pass: gmailPass
-    }
+    },
+    logger: true, // LOG EVERYTHING TO RENDER LOGS
+    debug: true   // SHOW DEBUG INFO
 });
 
 // Verify SMTP connection
@@ -187,7 +189,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// --- FALLBACK ROUTE (Keep this LAST) ---
+// --- FALLBACK ROUTE ---
 
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
