@@ -1,4 +1,4 @@
-console.log('--- SERVER STARTING v3.0 (Rich Dark Theme + SMTP Verify) ---');
+console.log(`[${new Date().toISOString()}] --- SERVER STARTING v3.0 (Rich Dark Theme) ---`);
 require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
@@ -9,42 +9,28 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Database Connection
-let pool;
-try {
-    pool = new Pool({
-        connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false }, // Required for Render Postgres
-        connectionTimeoutMillis: 5000 // 5 seconds timeout so it doesn't hang!
-    });
-    console.log('PostgreSQL pool created.');
-} catch (error) {
-    console.error('Failed to create PostgreSQL pool:', error);
-}
+console.log(`[${new Date().toISOString()}] EMAIL_USER is ${process.env.EMAIL_USER ? 'PRESENT' : 'MISSING'}`);
+console.log(`[${new Date().toISOString()}] EMAIL_PASS is ${process.env.EMAIL_PASS ? 'PRESENT' : 'MISSING'}`);
 
 // Nodemailer Transporter
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
-    secure: true, // use SSL
+    secure: true, 
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     }
 });
 
-// Verify SMTP connection at startup
+// Verify SMTP connection
+console.log(`[${new Date().toISOString()}] Starting Nodemailer verification...`);
 transporter.verify((error, success) => {
     if (error) {
-        console.error('--- NODEMAILER SMTP ERROR ---');
+        console.error(`[${new Date().toISOString()}] --- NODEMAILER SMTP ERROR ---`);
         console.error(error);
     } else {
-        console.log('--- NODEMAILER READY TO SEND EMAILS ---');
+        console.log(`[${new Date().toISOString()}] --- NODEMAILER READY TO SEND EMAILS ---`);
     }
 });
 
