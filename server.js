@@ -9,8 +9,32 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// LOG ENV CHECK
 console.log(`[${new Date().toISOString()}] EMAIL_USER is ${process.env.EMAIL_USER ? 'PRESENT' : 'MISSING'}`);
 console.log(`[${new Date().toISOString()}] EMAIL_PASS is ${process.env.EMAIL_PASS ? 'PRESENT' : 'MISSING'}`);
+console.log(`[${new Date().toISOString()}] DATABASE_URL is ${process.env.DATABASE_URL ? 'PRESENT' : 'MISSING'}`);
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Database Connection
+let pool;
+try {
+    if (process.env.DATABASE_URL) {
+        pool = new Pool({
+            connectionString: process.env.DATABASE_URL,
+            ssl: { rejectUnauthorized: false }, 
+            connectionTimeoutMillis: 5000 
+        });
+        console.log(`[${new Date().toISOString()}] PostgreSQL pool created.`);
+    } else {
+        console.warn(`[${new Date().toISOString()}] DATABASE_URL is missing. DB operations will be skipped.`);
+    }
+} catch (error) {
+    console.error(`[${new Date().toISOString()}] Failed to create PostgreSQL pool:`, error);
+}
 
 // Nodemailer Transporter
 const transporter = nodemailer.createTransport({
@@ -50,13 +74,13 @@ async function initDB() {
             )
         `);
         client.release();
-        console.log('Database table verified/created.');
+        console.log(`[${new Date().toISOString()}] Database table verified/created.`);
     } catch (err) {
-        console.error('Error verifying database:', err);
+        console.error(`[${new Date().toISOString()}] Error verifying database:`, err);
     }
 }
 
-console.log('Initializing API Routes...');
+console.log(`[${new Date().toISOString()}] Initializing API Routes...`);
 // Routes
 app.get('/api/debug', (req, res) => {
     res.status(200).json({
@@ -72,7 +96,7 @@ app.get('/api/register', (req, res) => {
 });
 
 app.post('/api/register', async (req, res) => {
-    console.log('--- NEW REGISTRATION REQUEST RECEIVED ---');
+    console.log(`[${new Date().toISOString()}] --- NEW REGISTRATION REQUEST RECEIVED ---`);
     console.log('Payload:', req.body);
     const { name, email, phone, instrument } = req.body;
 
@@ -85,23 +109,22 @@ app.post('/api/register', async (req, res) => {
         
         // 1. Save to Database with a 7-second timeout
         if (pool) {
-            console.log('Inserting into database...');
+            console.log(`[${new Date().toISOString()}] Inserting into database...`);
             const dbPromise = pool.query(
                 'INSERT INTO registrations (name, email, phone, instrument) VALUES ($1, $2, $3, $4)',
                 [name, email, phone, instrument]
             );
             
-            // Wait for DB but don't hang for more than 7s
             await Promise.race([
                 dbPromise,
                 new Promise((_, reject) => setTimeout(() => reject(new Error('Database Timeout')), 7000))
-            ]).then(() => console.log('Database insert complete.'))
-              .catch(err => console.error('Database Error/Timeout:', err.message));
+            ]).then(() => console.log(`[${new Date().toISOString()}] Database insert complete.`))
+              .catch(err => console.error(`[${new Date().toISOString()}] Database Error/Timeout:`, err.message));
         }
 
         // 2. Send Email with a 7-second timeout
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.DESTINATION_EMAIL) {
-            console.log(`Sending email FROM: ${process.env.EMAIL_USER} TO: ${process.env.DESTINATION_EMAIL}`);
+            console.log(`[${new Date().toISOString()}] Sending email FROM: ${process.env.EMAIL_USER} TO: ${process.env.DESTINATION_EMAIL}`);
             const mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: process.env.DESTINATION_EMAIL,
@@ -115,19 +138,18 @@ app.post('/api/register', async (req, res) => {
                 `
             };
             
-            // Wait for Email but don't hang for more than 7s
             await Promise.race([
                 transporter.sendMail(mailOptions),
                 new Promise((_, reject) => setTimeout(() => reject(new Error('Email Timeout')), 7000))
-            ]).then(() => console.log('Email sent complete.'))
-              .catch(err => console.error('Email Error/Timeout:', err.message));
+            ]).then(() => console.log(`[${new Date().toISOString()}] Email sent complete.`))
+              .catch(err => console.error(`[${new Date().toISOString()}] Email Error/Timeout:`, err.message));
         }
 
         console.timeEnd('Registration Process');
         res.status(200).json({ message: 'Registration successful!' });
     } catch (error) {
         console.timeEnd('Registration Process');
-        console.error('Final Route Error:', error);
+        console.error(`[${new Date().toISOString()}] Final Route Error:`, error);
         res.status(500).json({ message: 'Internal server error during registration.' });
     }
 });
@@ -139,7 +161,6 @@ app.use((req, res) => {
 
 // Start Server
 app.listen(PORT, () => {
-    console.log(`Server is UP on port ${PORT}`);
-    // Run DB init in background so it doesn't block startup
-    initDB().catch(err => console.error('Background DB Init Error:', err));
+    console.log(`[${new Date().toISOString()}] Server is UP on port ${PORT}`);
+    initDB().catch(err => console.error(`[${new Date().toISOString()}] Background DB Init Error:`, err));
 });
