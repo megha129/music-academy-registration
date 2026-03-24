@@ -36,7 +36,26 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
     
     console.log('Sending registration request to /api/register...');
     
+    // --- EMAILJS CONFIG (FILL THESE LATER) ---
+    const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY"; 
+    const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
+    const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+
     try {
+        // 1. Send Email via EmailJS (Frontend)
+        if (EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
+            emailjs.init(EMAILJS_PUBLIC_KEY);
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                from_name: formData.name,
+                from_email: formData.email,
+                phone: formData.phone,
+                instrument: formData.instrument,
+                to_email: "meghashreenandish14@gmail.com"
+            }).then(() => console.log('EmailJS: Success!'))
+              .catch(err => console.error('EmailJS Error:', err));
+        }
+
+        // 2. Save to Database (Backend)
         const response = await fetch('/api/register', {
             method: 'POST',
             headers: {
