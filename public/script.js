@@ -7,6 +7,16 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
     const spinner = submitBtn.querySelector('.spinner');
     const messageBox = document.getElementById('messageBox');
     
+    // Detect if testing on wrong local port
+    if (window.location.port === '3001') {
+        messageBox.textContent = '⚠️ You are on the DESIGN PREVIEW link. The "Register" button ONLY works on your Live Render Site. Please use the Render link I gave you!';
+        messageBox.className = 'message-box error';
+        submitBtn.disabled = false;
+        btnText.textContent = 'Register Now';
+        spinner.classList.add('hidden');
+        return;
+    }
+    
     // Reset message box
     messageBox.className = 'message-box hidden';
     messageBox.textContent = '';

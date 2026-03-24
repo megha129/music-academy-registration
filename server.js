@@ -58,6 +58,10 @@ async function initDB() {
 }
 
 // Routes
+app.get('/api/register', (req, res) => {
+    res.status(200).json({ message: 'Register API is active and ready for POST requests.' });
+});
+
 app.post('/api/register', async (req, res) => {
     const { name, email, phone, instrument } = req.body;
 
