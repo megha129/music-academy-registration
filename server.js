@@ -1,3 +1,4 @@
+console.log('--- SERVER STARTING v3.0 (Rich Dark Theme + SMTP Verify) ---');
 require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
