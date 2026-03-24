@@ -1,3 +1,4 @@
+console.log(`[${new Date().toISOString()}] --- SERVER STARTING v3.3 (SMTP FINAL ATTEMPT) ---`);
 require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
@@ -30,11 +31,20 @@ try {
 // Nodemailer Transporter
 const gmailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : '';
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    pool: true, // USE POOLING
     auth: {
         user: process.env.EMAIL_USER,
         pass: gmailPass
-    }
+    },
+    tls: {
+        servername: 'smtp.gmail.com', // EXPLICIT SNI
+        rejectUnauthorized: false
+    },
+    logger: true,
+    debug: true
 });
 
 // Create table if not exists
