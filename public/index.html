@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RYTHM ACADEMY | Registration</title>
+    <title>RYTHM ACADEMY | Programs</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
@@ -14,9 +14,9 @@
     
     <nav class="site-nav">
         <ul>
-            <li><a href="index.html" class="active">Register</a></li>
-            <li><a href="programs.html">Programs</a></li>
+            <li><a href="index.html" class="active">Programs</a></li>
             <li><a href="about.html">About</a></li>
+            <li><a href="register.html">Register</a></li>
         </ul>
     </nav>
     
@@ -24,48 +24,30 @@
         <header>
             <h1>RYTHM ACADEMY</h1>
             <p class="author-name">by MEGHA SHREE N<br>BSC DATA SCIENCE STUDENT</p>
-            <p>Unleash Your Musical Potential</p>
+            <p>Our Musical Programs</p>
         </header>
 
-        <!-- Registration Section -->
-        <section id="register" class="content-section">
+        <section id="programs" class="content-section">
             <div class="form-container">
-                <h2>Join Our Programs</h2>
-                <form id="registrationForm">
-                    <div class="input-group">
-                        <label for="name">Full Name</label>
-                        <input type="text" id="name" name="name" required placeholder="John Doe">
+                <h2>Available Instruments</h2>
+                <div class="programs-grid">
+                    <div class="program-card">
+                        <h3>🎹 Piano</h3>
+                        <p>From classical sonatas to modern jazz progression. Suitable for all skill levels.</p>
                     </div>
-                    
-                    <div class="input-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" required placeholder="john@example.com">
+                    <div class="program-card">
+                        <h3>🎸 Guitar</h3>
+                        <p>Acoustic and electric guitar training focusing on technique and theory.</p>
                     </div>
-                    
-                    <div class="input-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="tel" id="phone" name="phone" required placeholder="+1 234 567 8900">
+                    <div class="program-card">
+                        <h3>🎻 Violin</h3>
+                        <p>Orchestral and solo performance training with personalized techniques.</p>
                     </div>
-                    
-                    <div class="input-group">
-                        <label for="instrument">Instrument of Choice</label>
-                        <select id="instrument" name="instrument" required>
-                            <option value="" disabled selected>Select an instrument</option>
-                            <option value="Piano">Piano</option>
-                            <option value="Guitar">Guitar</option>
-                            <option value="Violin">Violin</option>
-                            <option value="Drums">Drums</option>
-                            <option value="Vocals">Vocals</option>
-                            <option value="Other">Other</option>
-                        </select>
+                    <div class="program-card">
+                        <h3>🥁 Drums</h3>
+                        <p>Rhythm mastery, limb coordination, and band performance skills.</p>
                     </div>
-
-                    <button type="submit" id="submitBtn">
-                        <span class="btn-text">Register Now</span>
-                        <div class="spinner hidden"></div>
-                    </button>
-                </form>
-                <div id="messageBox" class="message-box hidden"></div>
+                </div>
             </div>
         </section>
         
@@ -73,7 +55,5 @@
             <p>created the website using html css java nodejs MYSQL AND GITHUB</p>
         </footer>
     </div>
-    
-    <script src="script.js"></script>
 </body>
 </html>
