@@ -160,6 +160,30 @@ app.use((req, res) => {
 });
 
 // Start Server
+app.get('/api/test-email', async (req, res) => {
+    console.log('--- MANUAL EMAIL TEST TRIGGERED ---');
+    try {
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || !process.env.DESTINATION_EMAIL) {
+            return res.status(400).json({ message: 'Missing email env variables' });
+        }
+        
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: process.env.DESTINATION_EMAIL,
+            subject: 'Music Academy: Manual Test Email',
+            text: 'If you receive this, your email configuration is WORKING!'
+        };
+        
+        console.log('Sending test email...');
+        await transporter.sendMail(mailOptions);
+        console.log('Test email sent successfully');
+        res.status(200).json({ message: 'Test email sent! Check your inbox and spam.' });
+    } catch (err) {
+        console.error('Manual Test Email Error:', err);
+        res.status(500).json({ message: 'Error sending test email', error: err.message });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`[${new Date().toISOString()}] Server is UP on port ${PORT}`);
     initDB().catch(err => console.error(`[${new Date().toISOString()}] Background DB Init Error:`, err));
