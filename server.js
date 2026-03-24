@@ -102,7 +102,7 @@ app.post('/api/register', async (req, res) => {
 
         // 2. Send Email with a 7-second timeout
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.DESTINATION_EMAIL) {
-            console.log('Sending email...');
+            console.log(`Sending email FROM: ${process.env.EMAIL_USER} TO: ${process.env.DESTINATION_EMAIL}`);
             const mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: process.env.DESTINATION_EMAIL,
