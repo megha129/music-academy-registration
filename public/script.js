@@ -65,7 +65,7 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
     } catch (error) {
         // Network or other error
         console.error('Fetch Error:', error);
-        messageBox.textContent = 'Failed to connect to the server. Please try again later.';
+        messageBox.textContent = `Error: ${error.message}. Please check if you are on the Live Render site and not the Preview link.`;
         messageBox.className = 'message-box error';
     } finally {
         // Reset loading state

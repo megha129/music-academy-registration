@@ -113,7 +113,8 @@ app.use((req, res) => {
 });
 
 // Start Server
-app.listen(PORT, async () => {
-    console.log(`Server running on port ${PORT}`);
-    await initDB();
+app.listen(PORT, () => {
+    console.log(`Server is UP on port ${PORT}`);
+    // Run DB init in background so it doesn't block startup
+    initDB().catch(err => console.error('Background DB Init Error:', err));
 });
