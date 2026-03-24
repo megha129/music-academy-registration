@@ -35,7 +35,7 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
     spinner.classList.remove('hidden');
     
     // --- EMAILJS CONFIG ---
-    const EMAILJS_SERVICE_ID = "service_2x98zwz";
+    const EMAILJS_SERVICE_ID = "service_pad9pos";
     const EMAILJS_TEMPLATE_ID = "template_olpvqws";
 
     try {
