@@ -9,6 +9,9 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// TOP LEVEL PING
+app.get('/ping', (req, res) => res.send('PONG V3.1 - LATEST'));
+
 // LOG ENV CHECK
 console.log(`[${new Date().toISOString()}] EMAIL_USER is ${process.env.EMAIL_USER ? 'PRESENT' : 'MISSING'}`);
 console.log(`[${new Date().toISOString()}] EMAIL_PASS is ${process.env.EMAIL_PASS ? 'PRESENT' : 'MISSING'}`);
