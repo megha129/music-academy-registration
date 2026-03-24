@@ -36,10 +36,10 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
     
     console.log('Sending registration request to /api/register...');
     
-    // --- EMAILJS CONFIG (FILL THESE LATER) ---
-    const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY"; 
-    const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
-    const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+    // --- EMAILJS CONFIG ---
+    const EMAILJS_PUBLIC_KEY = "4hh-HDCpw_jMw5Dar"; 
+    const EMAILJS_SERVICE_ID = "service_2x98zwz";
+    const EMAILJS_TEMPLATE_ID = "template_olpvqws";
 
     try {
         // 1. Send Email via EmailJS (Frontend)
