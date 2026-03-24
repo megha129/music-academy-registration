@@ -83,24 +83,24 @@ app.post('/api/register', async (req, res) => {
 
     try {
         console.time('Registration Process');
-        // 1. Save to Database
+        
+        // 1. Save to Database with a 7-second timeout
         if (pool) {
             console.log('Inserting into database...');
-            await pool.query(
+            const dbPromise = pool.query(
                 'INSERT INTO registrations (name, email, phone, instrument) VALUES ($1, $2, $3, $4)',
                 [name, email, phone, instrument]
             );
-            console.log('Database insert complete.');
-        } else {
-            console.warn('Database not connected. Skipping DB insert.');
+            
+            // Wait for DB but don't hang for more than 7s
+            await Promise.race([
+                dbPromise,
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Database Timeout')), 7000))
+            ]).then(() => console.log('Database insert complete.'))
+              .catch(err => console.error('Database Error/Timeout:', err.message));
         }
-    } catch (dbError) {
-        console.error('Database Error:', dbError);
-        // We continue to email even if DB fails for now, or you can choose to fail here
-    }
 
-    try {
-        // 2. Send Email
+        // 2. Send Email with a 7-second timeout
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.DESTINATION_EMAIL) {
             console.log('Sending email...');
             const mailOptions = {
@@ -116,16 +116,19 @@ app.post('/api/register', async (req, res) => {
                 `
             };
             
-            await transporter.sendMail(mailOptions);
-            console.log('Email sent complete.');
-        } else {
-            console.warn('Email credentials not fully configured. Skipping email.');
+            // Wait for Email but don't hang for more than 7s
+            await Promise.race([
+                transporter.sendMail(mailOptions),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Email Timeout')), 7000))
+            ]).then(() => console.log('Email sent complete.'))
+              .catch(err => console.error('Email Error/Timeout:', err.message));
         }
+
         console.timeEnd('Registration Process');
         res.status(200).json({ message: 'Registration successful!' });
     } catch (error) {
         console.timeEnd('Registration Process');
-        console.error('Final Registration Error:', error);
+        console.error('Final Route Error:', error);
         res.status(500).json({ message: 'Internal server error during registration.' });
     }
 });
