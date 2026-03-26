@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const { Pool } = require('pg');
+const mysql = require('mysql2/promise');
 const cors = require('cors');
 const path = require('path');
 
@@ -15,25 +15,27 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Database Connection
 let pool;
 try {
-    if (process.env.DATABASE_URL) {
-        pool = new Pool({
-            connectionString: process.env.DATABASE_URL,
-            ssl: { rejectUnauthorized: false }, 
-            connectionTimeoutMillis: 5000 
-        });
-    }
+    pool = mysql.createPool({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        port: process.env.DB_PORT || 3306,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0
+    });
 } catch (error) {
-    console.error(`PostgreSQL Error:`, error);
+    console.error(`MySQL Error:`, error);
 }
 
 // Create table if not exists
 async function initDB() {
     if (!pool) return;
     try {
-        const client = await pool.connect();
-        await client.query(`
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS registrations (
-                id SERIAL PRIMARY KEY,
+                id INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
                 email VARCHAR(255) NOT NULL,
                 phone VARCHAR(50) NOT NULL,
@@ -41,7 +43,7 @@ async function initDB() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
-        client.release();
+        console.log("Database initialized.");
     } catch (err) {
         console.error(`DB Init Error:`, err);
     }
@@ -60,7 +62,7 @@ app.post('/api/register', async (req, res) => {
     try {
         if (pool) {
             await pool.query(
-                'INSERT INTO registrations (name, email, phone, instrument) VALUES ($1, $2, $3, $4)',
+                'INSERT INTO registrations (name, email, phone, instrument) VALUES (?, ?, ?, ?)',
                 [name, email, phone, instrument]
             );
         }
@@ -78,9 +80,10 @@ app.get('/api/admin/registrations', async (req, res) => {
 
     try {
         if (!pool) return res.status(500).json({ message: 'DB not connected' });
-        const result = await pool.query('SELECT * FROM registrations ORDER BY created_at DESC');
-        res.status(200).json(result.rows);
+        const [rows] = await pool.query('SELECT * FROM registrations ORDER BY created_at DESC');
+        res.status(200).json(rows);
     } catch (err) {
+        console.error(`Admin Route Error:`, err);
         res.status(500).json({ message: 'Error fetching registrations' });
     }
 });
