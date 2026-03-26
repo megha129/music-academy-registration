@@ -93,8 +93,17 @@ app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start Server
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+
+// Export for Vercel
+module.exports = app;
+
+// Start Server (Only locally)
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+        initDB();
+    });
+} else {
+    // Initializing DB on cold start for Vercel
     initDB();
-});
+}
